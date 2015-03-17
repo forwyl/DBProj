@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'dist/semantic.css' %}"/>
+	<!--   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script> -->
+	<script src="{% static 'jquery/dist/jquery.js' %}"></script>
+	<script src="{% static 'dist/semantic.js' %}"></script>
+	<script type="text/javascript">
+		var sem  = $.noConflict(true);
+	</script>
+<title>Result</title>
+</head>
+<body>
+
+	<script type="text/javascript">
+		sem(document).ready(function(){
+			sem("#logout_signal").click(function(){
+				sem.ajax({
+					type: "POST",
+					url: "{% url 'user_logout' %}",
+				}).done(function(data){
+					alert("登出成功");
+					location.reload();
+				}).fail(function(data){
+	    			alert("登出失敗");
+				});
+			});
+			
+		});	
+	</script>
+	
+	{% if user.is_authenticated %}
+		<h1 id="welcome_login">歡迎您， {{ user.username }}  !</h1>
+		<br>
+		<button id="logout_signal">登出</button>
+		<br>
+		<a href= "/welcome" >回首頁</a>			
+	{% else %}
+		<h1>歡迎您，訪客! </h1>
+		<br>
+		{% include "register.html" %}
+		<br>
+		{% include "login.html" %}
+	{% endif %}
+	
+	<table class="ui striped table">
+		<thead>
+		  <tr><th colspan="3">查詢結果</th></tr>
+		</thead>
+		<tbody>
+			{% for r in result %}
+			<tr class="center aligned">
+				<td><i class="gift icon"></i><a href="{% url 'detail' id=r.key %}">{{r.title}}</a></td>
+				<td>{{r.producer.address}}</td>
+				<td class="right aligned">{{r.producer.phone}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+</body>
+</html>

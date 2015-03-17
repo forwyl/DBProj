@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+	{% load staticfiles %}
+
+	<!--  JQuery UI -->
+	<link rel="stylesheet" href="{% static 'jquery_ui_1.10.4/development-bundle/themes/base/jquery.ui.all.css' %}">
+	<link rel="stylesheet" href="{% static 'jquery_ui_1.10.4/development-bundle/demos/demos.css' %}">
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/jquery-1.10.2.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.core.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.widget.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.mouse.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.button.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.draggable.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.position.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.resizable.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.button.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.dialog.js' %}"></script>
+	<script src="{% static 'jquery_ui_1.10.4/development-bundle/ui/jquery.ui.effect.js' %}"></script>
+
+	<title>Login</title>
+
+	<script>
+	$(function() {
+		var name = $( "#login_name" ),
+			password = $( "#login_password" ),
+			allFields = $( [] ).add( name ).add( password ),
+			tips = $( ".validateTips" );
+
+		function updateTips( t ) {
+			tips
+				.text( t )
+				.addClass( "ui-state-highlight" );
+			setTimeout(function() {
+				tips.removeClass( "ui-state-highlight", 1500 );
+			}, 500 );
+		}
+
+		function checkLength( o, n, min, max ) {
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass( "ui-state-error" );
+				updateTips( n + "長度必須介於" +
+					min + "和" + max + "." );
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		function checkRegexp( o, regexp, n ) {
+			if ( !( regexp.test( o.val() ) ) ) {
+				o.addClass( "ui-state-error" );
+				updateTips( n );
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		$( "#login-dialog-form" ).dialog({
+			autoOpen: false,
+			height: 300,
+			width: 350,
+			modal: true,
+			buttons: {
+				"Login": function() {
+					var bValid = true;
+					allFields.removeClass( "ui-state-error" );
+
+					bValid = bValid && checkLength( name, "Account", 3, 16 );
+					bValid = bValid && checkLength( password, "Password", 5, 16 );
+
+					// From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
+					bValid = bValid && checkRegexp( name, /^[a-z]([0-9a-z_])+$/i, " 帳號應為英文字母和數字混合" );
+					bValid = bValid && checkRegexp( password, /^([0-9a-zA-Z])+$/, "密碼僅允許: a-z 0-9" );
+					
+					if ( bValid ) {
+						$.ajax({
+							type: "POST",
+							url: "{% url 'user_login' %}",
+							data:{name:name.val(), password:password.val()}
+						}).done(function(data){
+							if (data["status"] == "0"){
+				    	     	alert(data["result_message"]);
+								location.reload();
+							}else if(data["status"] == "1"){
+				    	     	$("#login_name").attr("disabled", "True");
+				    	     	$("#login_password").attr("disabled", "True");
+				    	     	alert(data["result_message"]);
+				    	     	location.reload();
+							}
+						}).fail(function(data){
+			    			alert(data["result_message"]);
+							location.reload();
+						});				
+					}
+				},
+				"Cancel": function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			close: function() {
+				allFields.val( "" ).removeClass( "ui-state-error" );
+			}
+		});
+
+		$( "#login-user" )
+			.click(function() {
+				$( "#login-dialog-form" ).dialog( "open" );
+			});
+	});
+	</script>
+
+
+</head>
+<body>
+
+	<div id="login-dialog-form" title="Login Form">
+		<p class="validateTips">Please fill in the fields below</p>
+	
+		<form id="login_form" method="post">
+		<fieldset>
+			<label for="login_name">Account</label>
+			<div class="ui input focus">
+				<input type="text" name="login_name" id="login_name" class="text ui-widget-content ui-corner-all" />
+			</div>		
+			<div class="ui horizontal divider">And</div>
+			<label for="login_password">Password</label>
+			<div class="ui input focus">
+				<input type="password" name="login_password" id="login_password" value="" class="text ui-widget-content ui-corner-all" />
+			</div>
+		</fieldset>
+		</form>
+	</div>
+	
+	<a id="login-user">Login</a>
+	
+</body>
+</html>

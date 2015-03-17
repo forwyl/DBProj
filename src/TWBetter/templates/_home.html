@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'dist/semantic.css' %}"/>
+	<!--   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script> -->
+	<script src="{% static 'jquery/dist/jquery.js' %}"></script>
+	<script src="{% static 'dist/semantic.js' %}"></script>
+	<script type="text/javascript">
+		var sem  = $.noConflict(true);
+	</script>
+	<title>Home</title>
+</head>
+<body>
+	<script type="text/javascript">
+		sem(document).ready(function(){
+			sem('.ui.test.toggle.checkbox').checkbox();
+			sem("#logout_signal").click(function(){
+				sem.ajax({
+					type: "POST",
+					url: "{% url 'user_logout' %}",
+				}).done(function(data){
+					alert("登出成功");
+					location.reload();
+				}).fail(function(data){
+	    			alert("登出失敗");
+				});
+			});			
+		});
+	</script>
+	
+	{% if user.is_authenticated %}
+		<h1 id="welcome_login">歡迎您， {{ user.username }}  !</h1>
+		<br>
+		<button id="logout_signal">登出</button>
+		<a href= "/display_favorite" >我的追蹤清單</a>	
+	{% else %}
+		<h1>歡迎您，訪客! </h1>
+		<br>
+		{% include "register.html" %}
+		<br>
+		{% include "login.html" %}
+	{% endif %}
+
+	<div>
+		<form action="{% url 'query_info' %}" method="post">
+			<div class="column">
+			{% for key,value in county_dict.items %}
+			  <div class="ui test toggle checkbox">
+			    	<input type="checkbox" id="county" name="county" value="{{key}}" />
+					<label for="county">
+						{{ value }}
+					</label>
+			  </div>
+			 {% endfor %}
+			</div>
+			<input type="submit" value="查詢"/>
+		</form>
+	</div>
+
+
+
+</body>
+</html>

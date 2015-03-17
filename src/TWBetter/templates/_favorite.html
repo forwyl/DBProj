@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'dist/semantic.css' %}"/>
+	<!--   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script> -->
+	<script src="{% static 'jquery/dist/jquery.js' %}"></script>
+	<script src="{% static 'dist/semantic.js' %}"></script>
+	<script type="text/javascript">
+		var sem  = $.noConflict(true);
+	</script>
+	<title>Favorite</title>
+
+</head>
+<body>
+
+	{% if user.is_authenticated %}
+		<br>
+		<a href= "/welcome" >回首頁</a>
+		<table class="ui striped table">
+			<thead>
+			  <tr><th colspan="3">我的追蹤清單</th></tr>
+			</thead>
+			<tbody>
+				{% for f in favorite_list %}
+				<tr class="center aligned">
+					<td><i class="gift icon"></i><a href="{% url 'detail' id=f.gfood.key %}">{{ f.gfood.title}}</a></td>
+					<td>{{f.gfood.producer.address}}</td>
+					<td class="right aligned">{{f.gfood.producer.phone}}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+
+</body>
+</html>
