@@ -12,10 +12,9 @@ from django.http import HttpResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, render_to_response
 from django.template.context import RequestContext
-
+from django.utils.encoding import smart_unicode, smart_text
 from DBProj import settings
 from TWBetter.models import Producer, GFood, UserProfile, Favorite
-
 
 # Create your views here.
 def welcome(request):
@@ -26,24 +25,23 @@ def welcome(request):
 
 def query_info(request):
     if request.method == "POST":
-        selects = [x.encode("utf-8") for x in request.POST.getlist("county")]
-        print "---收到內容---"
+        selects = [int(x.encode('utf-8')) for x in request.POST.getlist("county")]
+        print "---收到內容---\n"
         print selects
-        print "--- Session內容---"
-        for key in request.session["county_dict"].keys():
-            value = request.session["county_dict"][key].encode("utf-8")
-            print "鍵值:", str(key), ";值:", str(value)
+        print "--- Session內容---\n"
+        county_dict = request.session["county_dict"]
+        for key in county_dict.keys():
+            print "鍵值:%d, ;值:%s \n" %(key, county_dict[key])
         val_list = []
         for s in selects:
-            value = request.session["county_dict"][s].encode("utf-8")
-            val_list.append(value)
-        print "--- query內容---"
+            val_list.append(county_dict[s])
+        print "--- query內容---\n"
         for v in val_list:
             print v
         result = GFood.objects.filter(reduce(operator.or_, (Q(producer__address__contains=x) for x in val_list)))
-        print "--- query結果---"
+        print "--- query結果---\n"
         for r in result:
-            print r.key, ";", r.title, ";", r.producer.address
+            print "Key:%s, Title:%s, Address:%s \n"  %(r.key, r.title, r.producer.address)
         
         return render(request, 'result.html', {"result":result})
 

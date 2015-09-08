@@ -52,7 +52,8 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'DBProj.urls'
 
 WSGI_APPLICATION = 'DBProj.wsgi.application'
-
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SAVE_EVERY_REQUEST=True
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -67,14 +68,12 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'UTF-8'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
