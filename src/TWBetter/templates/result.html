@@ -16,7 +16,6 @@
 <script src='http://cdn2.editmysite.com/js/site/main.js?buildTime=1234'></script>
 
 	<!-- Django -->
-
 		<link rel="stylesheet" type="text/css" href="{% static 'dist/semantic.css' %}"/>
 		<!--   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script> -->
 		<script src="{% static 'jquery/dist/jquery.js' %}"></script>
@@ -24,9 +23,12 @@
 		<script type="text/javascript">
 			var sem  = $.noConflict(true);
 		</script>
-
 	<!-- Django -->
-
+	
+	<!--  GoogleMap -->
+    	<style> #map { height: 60%;} </style>
+	<!--  GoogleMap -->
+	
 </head>
 <body class='short-header-page  wsite-theme-light wsite-page-favorite'>
 
@@ -47,6 +49,37 @@
 		});	
 	</script>
 
+    <script>
+		var pagemap;
+		function initMap() {
+			 pagemap = new google.maps.Map(document.getElementById('map'), {
+			   center: {lat: -34.397, lng: 150.644},
+			   zoom: 8
+			 });
+			
+			{% for r in result %}
+				var geocoder = new google.maps.Geocoder();
+				try{
+					var addr = "{{r.producer.address}}";
+					geocoder.geocode({'address': addr}, function(results, status) {
+					if (status === google.maps.GeocoderStatus.OK) {
+						   pagemap.setCenter(results[0].geometry.location);
+						      var marker = new google.maps.Marker({
+						      map: pagemap,
+						      position: results[0].geometry.location
+						    });
+						  } else {
+						    alert('Geocode was not successful for the following reason: ' + status);
+						  }
+						});
+				}catch(e){
+					alert(addr);	
+				}
+			{% endfor %}
+		}
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?callback=initMap"	async defer></script>
+	
 	<div id="nav-wrap">
         <div class="container">
             <table id="header">
@@ -78,6 +111,8 @@
 		</div>
 	</div>
 
+	<div id="map"></div>
+	
     <div id="main-wrap">
         <div class="container">
    			<div id='wsite-content' class='wsite-elements wsite-not-footer'>
